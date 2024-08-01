@@ -63,15 +63,19 @@ $(function(){
    // 随机省市区
    function getRandomCountyKey(data) {
     function getRandomCounty(obj) {
-        var keys = Object.keys(obj);
-        var randomKey = keys[Math.floor(Math.random() * keys.length)];
-        var value = obj[randomKey];
+      var keys = Object.keys(obj);
+      var randomKey, value;
 
-        if (typeof value === 'string') {
-            return randomKey;
-        } else {
-            return getRandomCounty(value);
-        }
+      do {
+          randomKey = keys[Math.floor(Math.random() * keys.length)];
+          value = obj[randomKey];
+      } while (typeof value !== 'string' && (typeof value === 'object' && Object.keys(value).length === 0));
+
+      if (typeof value === 'string') {
+          return randomKey;
+      } else {
+          return getRandomCounty(value);
+      }
     }
 
     var countyCode = getRandomCounty(data);
