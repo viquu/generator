@@ -59,3 +59,28 @@ $(function(){
     $obj.empty();
     $obj.append("<option value='-1'>请选择</option>");
    }
+
+   // 随机省市区
+   function getRandomCountyKey(data) {
+    function getRandomCounty(obj) {
+        var keys = Object.keys(obj);
+        var randomKey = keys[Math.floor(Math.random() * keys.length)];
+        var value = obj[randomKey];
+
+        if (typeof value === 'string') {
+            return randomKey;
+        } else {
+            return getRandomCounty(value);
+        }
+    }
+
+    var countyCode = getRandomCounty(data);
+    var cityCode = countyCode.slice(0, 4) + '00';
+    var provinceCode = countyCode.slice(0, 2) + '0000';
+
+    return {
+        provinceKey: provinceCode,
+        cityKey: cityCode,
+        countyKey: countyCode
+    };
+}

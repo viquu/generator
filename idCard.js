@@ -6,6 +6,63 @@
          minView: 'month'
 
       });
+    
+      // 随机生日
+      function getRandomDate(startYear, endYear) {
+        function padToTwoDigits(num) {
+            return num.toString().padStart(2, '0');
+        }
+    
+        var startDate = new Date(startYear, 0, 1); // January 1st of startYear
+        var endDate = new Date(endYear, 11, 31); // December 31st of endYear
+    
+        var randomTimestamp = startDate.getTime() + Math.random() * (endDate.getTime() - startDate.getTime());
+        var randomDate = new Date(randomTimestamp);
+    
+        var year = randomDate.getFullYear();
+        var month = padToTwoDigits(randomDate.getMonth() + 1); // getMonth() returns 0-11
+        var day = padToTwoDigits(randomDate.getDate());
+    
+        return `${year}-${month}-${day}`;
+      }
+
+      // 随机性别
+      function getRandomInt(min, max) {
+        return Math.floor(Math.random() * (max - min + 1)) + min;
+      }
+    
+      // 随机身份证
+      function randomGenId() {
+        var $province = $('#province');
+        var $city = $('#city');
+        var $county = $('#county');
+        $.getJSON('area.json',function(data){
+          area = data;
+          // Get a random county key with its province and city keys
+          var randomKeys = getRandomCountyKey(data);
+          console.log(randomKeys); // Example output: { provinceKey: '450000', cityKey: '450800', countyKey: '450802' }
+          $province.val(randomKeys.provinceKey).change(); // 触发change事件，更新城市选项
+
+          // 使用延迟确保省市级联完成后，再选城市和区县
+          setTimeout(function() {
+              $city.val(randomKeys.cityKey).change(); // 触发change事件，更新区县选项
+
+              setTimeout(function() {
+                  $county.val(randomKeys.countyKey).change(); // 触发change事件
+                  generateId();
+              }, 50); // 50毫秒延迟，根据实际情况调整
+          }, 50); // 50毫秒延迟，根据实际情况调整
+          
+          var randomDate = getRandomDate(1960, 2000);
+          console.log(randomDate); // Example output: "1983-07-24"
+          $('#birthday').val(randomDate);
+
+          var randomValue = getRandomInt(1, 2); // Generates a random number between 1 and 2
+          $('input[name="sex"][value="' + randomValue + '"]').prop('checked', true);
+          
+        });
+        
+      }
 
       /**生成身份证号**/
       function generateId(){
