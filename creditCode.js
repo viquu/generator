@@ -347,7 +347,17 @@ function generatorCreditCode(){
   if (C18 == 31) {
       C18 = '0';
   }
-   $("#creditCode").val(code+getMapR(C18.toString()));   
+
+   var value = code+getMapR(C18.toString());
+   $("#creditCode").val(value); 
+
+   // 执行复制命令
+   navigator.clipboard.writeText(value).then(function() {
+      toastr.info('已复制到剪贴板');
+   }).catch(function(err) {
+      toastr.warning('复制失败');
+      console.error('复制失败: ', err);
+   });
 }
 
 /*获得登记机构*/

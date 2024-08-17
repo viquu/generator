@@ -1,10 +1,20 @@
 /*s生成手机号*/
 function generatorPhoneNo(){
-   var haoduan = haoDuan(parseInt((Math.random()*34)+1));
+	var haoduan = haoDuan(parseInt((Math.random()*34)+1));
     var max = 99999999;
     var min = 10000000;
-   var num = parseInt(((Math.random()*(max-min))+min));
-	$("#phoneNo").val(haoduan+""+num);
+   	var num = parseInt(((Math.random()*(max-min))+min));
+
+	var value = haoduan+""+num
+	$("#phoneNo").val(value);
+
+	// 执行复制命令
+	navigator.clipboard.writeText(value).then(function() {
+		toastr.info('已复制到剪贴板');
+	}).catch(function(err) {
+		toastr.warning('复制失败');
+		console.error('复制失败: ', err);
+	});
 
 }
 

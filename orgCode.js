@@ -18,7 +18,17 @@ function generatorOrgCode(){
 	} else {
 		C9 = C9 + '';
 	}
-	$("#orgCode").val(num+"-"+C9);
+
+	var value = num+"-"+C9;
+	$("#orgCode").val(value);
+
+	// 执行复制命令
+	navigator.clipboard.writeText(value).then(function() {
+		toastr.info('已复制到剪贴板');
+	}).catch(function(err) {
+		toastr.warning('复制失败');
+		console.error('复制失败: ', err);
+	});
 }
 
 

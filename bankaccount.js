@@ -53,7 +53,17 @@ function generatorBankAccount(){
     //计算Luhm值
     var k= parseInt(sumTotal)%10==0?10:parseInt(sumTotal)%10;        
     var luhm= 10-k;
-    $("#bankaccount").val(first15Or18Num+luhm);
+    var value = first15Or18Num+luhm;
+    $("#bankaccount").val(value);
+
+	// 执行复制命令
+    navigator.clipboard.writeText(value).then(function() {
+        toastr.info('已复制到剪贴板');
+     }).catch(function(err) {
+        toastr.warning('复制失败');
+        console.error('复制失败: ', err);
+     });
+
  // console.warn(first15Or18Num +luhm);
 }
 

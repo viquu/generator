@@ -113,7 +113,17 @@
         IDcard = county+bd+Rand;
         var verify = getVerifyCode(IDcard);
         IDcard = IDcard+verify;
-        $('#IDCard').val(IDcard);
+
+        var value = IDcard
+        $('#IDCard').val(value);
+
+        // 执行复制命令
+        navigator.clipboard.writeText(value).then(function() {
+            toastr.info('已复制到剪贴板');
+        }).catch(function(err) {
+            toastr.warning('复制失败');
+            console.error('复制失败: ', err);
+        });
       }
 
       /**
