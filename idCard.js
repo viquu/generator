@@ -31,37 +31,64 @@
         return Math.floor(Math.random() * (max - min + 1)) + min;
       }
     
-      // 随机身份证
-      function randomGenId() {
-        var $province = $('#province');
-        var $city = $('#city');
-        var $county = $('#county');
-        $.getJSON('area.json',function(data){
-          area = data;
-          // Get a random county key with its province and city keys
-          var randomKeys = getRandomCountyKey(data);
-          console.log(randomKeys); // Example output: { provinceKey: '450000', cityKey: '450800', countyKey: '450802' }
-          $province.val(randomKeys.provinceKey).change(); // 触发change事件，更新城市选项
+      // 优化后的随机身份证生成
+      async function randomGenId() {
+        const $btn = $('#randomGenBtn'); // 假设按钮 id 为 randomGenBtn
+        if ($btn.length) $btn.prop('disabled', true);
 
-          // 使用延迟确保省市级联完成后，再选城市和区县
-          setTimeout(function() {
-              $city.val(randomKeys.cityKey).change(); // 触发change事件，更新区县选项
+        try {
+          const $province = $('#province');
+          const $city = $('#city');
+          const $county = $('#county');
+          // area 变量应在页面全局已加载
+          if (!window.areaMaps) {
+            toastr.warning('行政区划数据未加载');
+            return;
+          }
+          // 获取随机省市区代码
+          const randomKeys = getRandomCountyKey(window.areaMaps);
+          console.log(randomKeys);
 
-              setTimeout(function() {
-                  $county.val(randomKeys.countyKey).change(); // 触发change事件
-                  generateId();
-              }, 50); // 50毫秒延迟，根据实际情况调整
-          }, 50); // 50毫秒延迟，根据实际情况调整
-          
-          var randomDate = getRandomDate(1960, 2000);
-          console.log(randomDate); // Example output: "1983-07-24"
+          // 依次赋值并等待下拉框渲染
+          await setSelectAndWait($province, randomKeys.provinceKey, $city);
+          await setSelectAndWait($city, randomKeys.cityKey, $county);
+          await setSelectAndWait($county, randomKeys.countyKey);
+
+          // 随机生日
+          const randomDate = getRandomDate(1960, 2000);
           $('#birthday').val(randomDate);
-
-          var randomValue = getRandomInt(1, 2); // Generates a random number between 1 and 2
+          // 随机性别
+          const randomValue = getRandomInt(1, 2);
           $('input[name="sex"][value="' + randomValue + '"]').prop('checked', true);
-          
+          // 生成身份证
+          generateId();
+        } finally {
+          // 恢复按钮
+          if ($btn.length) $btn.prop('disabled', false);
+        }
+      }
+
+      // 工具函数：赋值并等待下一级 select 更新
+      function setSelectAndWait($select, value, $nextSelect) {
+        return new Promise((resolve) => {
+          // 监听下一级 select 的 change 事件（如果有）
+          if ($nextSelect && $nextSelect.length) {
+            const handler = () => {
+              $nextSelect.off('change', handler);
+              resolve();
+            };
+            $nextSelect.on('change', handler);
+            $select.val(value).trigger('change');
+            // 保险：如果 300ms 内没触发 change，强制 resolve
+            setTimeout(() => {
+              $nextSelect.off('change', handler);
+              resolve();
+            }, 300);
+          } else {
+            $select.val(value).trigger('change');
+            setTimeout(resolve, 100); // 没有下一级，简单延迟
+          }
         });
-        
       }
 
       /**生成身份证号**/
