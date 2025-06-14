@@ -33,37 +33,36 @@
     
       // 优化后的随机身份证生成
       async function randomGenId() {
-        const $btn = $('#randomGenBtn'); // 假设按钮 id 为 randomGenBtn
+        const $btn = $('#randomGenBtn');
         if ($btn.length) $btn.prop('disabled', true);
-
         try {
-          const $province = $('#province');
-          const $city = $('#city');
-          const $county = $('#county');
-          // area 变量应在页面全局已加载
           if (!window.areaMaps) {
             toastr.warning('行政区划数据未加载');
             return;
           }
-          // 获取随机省市区代码
+          // 获取随机区县代码
           const randomKeys = getRandomCountyKey(window.areaMaps);
-          console.log(randomKeys);
-
-          // 依次赋值并等待下拉框渲染
-          await setSelectAndWait($province, randomKeys.provinceKey, $city);
-          await setSelectAndWait($city, randomKeys.cityKey, $county);
-          await setSelectAndWait($county, randomKeys.countyKey);
-
+          const county = randomKeys.countyKey;
           // 随机生日
-          const randomDate = getRandomDate(1960, 2000);
-          $('#birthday').val(randomDate);
+          const randomDate = getRandomDate(1960, 2000).replace(/-/g, "");
           // 随机性别
-          const randomValue = getRandomInt(1, 2);
-          $('input[name="sex"][value="' + randomValue + '"]').prop('checked', true);
-          // 生成身份证
-          generateId();
+          const sex = getRandomInt(1, 2);
+          // 随机顺序码
+          let Rand = Math.floor(100 + Math.random() * (999 - 100));
+          if (sex === 1 && Rand % 2 === 0) Rand += 1;
+          if (sex === 2 && Rand % 2 !== 0) Rand += 1;
+          let IDcard = county + randomDate + Rand;
+          const verify = getVerifyCode(IDcard);
+          IDcard = IDcard + verify;
+          $('#IDCard').val(IDcard);
+          // 复制到剪贴板
+          navigator.clipboard.writeText(IDcard).then(function() {
+            toastr.info('已复制到剪贴板');
+          }).catch(function(err) {
+            toastr.warning('复制失败');
+            console.error('复制失败: ', err);
+          });
         } finally {
-          // 恢复按钮
           if ($btn.length) $btn.prop('disabled', false);
         }
       }
