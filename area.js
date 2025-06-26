@@ -60,23 +60,47 @@ $(function(){
 
    // 随机省市区
    function getRandomCountyKey(data) {
+    // Helper function to recursively find a valid county
     function getRandomCounty(obj) {
-      var keys = Object.keys(obj);
-      var randomKey, value;
+        // Get all possible keys at the current level
+        var keys = Object.keys(obj);
+        // If there are no keys, it's a dead end.
+        if (keys.length === 0) {
+            return null;
+        }
+        // Shuffle keys to ensure random traversal
+        var shuffledKeys = keys.sort(() => 0.5 - Math.random());
 
-      do {
-          randomKey = keys[Math.floor(Math.random() * keys.length)];
-          value = obj[randomKey];
-      } while (typeof value !== 'string' && (typeof value === 'object' && Object.keys(value).length === 0));
+        // Iterate through the keys to find a valid path
+        for (var i = 0; i < shuffledKeys.length; i++) {
+            var key = shuffledKeys[i];
+            var value = obj[key];
 
-      if (typeof value === 'string') {
-          return randomKey;
-      } else {
-          return getRandomCounty(value);
-      }
+            // Base case: If the value is a string, we've found a county code.
+            if (typeof value === 'string') {
+                return key;
+            }
+
+            // Recursive step: If it's a non-empty object, go deeper.
+            if (typeof value === 'object' && value !== null) {
+                var result = getRandomCounty(value);
+                // If the recursive call found a county, return it.
+                if (result) {
+                    return result;
+                }
+            }
+            // If it's an empty object or a dead-end path, the loop continues to the next key.
+        }
+        // If all keys at this level lead to dead ends, return null.
+        return null;
     }
 
-    var countyCode = getRandomCounty(data);
+    var countyCode = null;
+    // Keep trying until a valid county code is found.
+    while (countyCode === null) {
+        countyCode = getRandomCounty(data);
+    }
+
     var cityCode = countyCode.slice(0, 4) + '00';
     var provinceCode = countyCode.slice(0, 2) + '0000';
 
