@@ -1,0 +1,2 @@
+# 覆盖全局 gitignore，允许提交设计文档
+!docs/plans/
