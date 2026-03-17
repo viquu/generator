@@ -14,6 +14,12 @@
       <el-col :span="12">
         <BankCardGenerator />
       </el-col>
+      <el-col :span="12">
+        <TelephoneGenerator />
+      </el-col>
+      <el-col :span="12">
+        <EmailGenerator />
+      </el-col>
     </el-row>
   </div>
 </template>
@@ -23,6 +29,8 @@ import IdCardGenerator from './components/IdCardGenerator.vue'
 import CreditCodeGenerator from './components/CreditCodeGenerator.vue'
 import PhoneGenerator from './components/PhoneGenerator.vue'
 import BankCardGenerator from './components/BankCardGenerator.vue'
+import TelephoneGenerator from './components/TelephoneGenerator.vue'
+import EmailGenerator from './components/EmailGenerator.vue'
 </script>
 
 <style>
